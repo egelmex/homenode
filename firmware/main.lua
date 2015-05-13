@@ -1,9 +1,10 @@
 local blinkm = require "blinkM"
-print(node.heap())
 local mcp = require "mcp9808"
 
 m = mqtt.Client("node-" .. wifi.sta.getmac(), 120, "user", "password")
-topic = "home/bedroom1/led"
+
+led_topic = "home/bedroom1/radiator"
+temp_topic = "home/bedroom1/temp"
 mqtt_host = "192.168.1.10"
 
 tempAddr = 0x18
@@ -12,10 +13,8 @@ blinkmAddr = 0x09
 id = 0
 sda = 1 
 scl = 2
-led = 3
 
 i2c.setup(id, sda, scl, i2c.SLOW)
-gpio.mode(led, gpio.OUTPUT)
 
 tempModule = mcp.create(tempAddr)
 blink = blinkm.create(blinkmAddr)
@@ -25,7 +24,7 @@ function mq_connect()
       m:connect(mqtt_host, 1883, 0, function(conn)
 	tmr.stop(1)
 	print("mq: connected") 
-	m:subscribe(topic, 0, function(client, topic, message)
+	m:subscribe(led_topic, 0, function(client, topic, message)
 		if message == Nil then
 			print("mq: subscribe success" )
 		else
@@ -60,15 +59,13 @@ m:on("message", function(conn, t, data)
   print(t .. ":" ) 
   if data ~= nil then print(data) end
 
-  if topic == t then
+  if led_topic == t then
 	print ("Topic matched:")
 	if data == 1 or data == "1" then
-		gpio.write(led, gpio.HIGH)
 		blink:stopScript()
 		blink:fadeToRGB(0,255,0)
 		
 	else
-		gpio.write(led, gpio.LOW)
 		blink:stopScript()
 		blink:fadeToRGB(255,0,0)
 	end
@@ -78,13 +75,15 @@ end)
 tmr.alarm(2, 5000, 1, function()
 	temp = tempModule:readC()
 
-	m:publish("bedroom1/temp",temp,0,0, function(conn) 
+	m:publish(temp_topic, temp, 0, 0, function(conn) 
 		print("Temp=",temp)
 	end)
 end)
 
-print("playing light script")
 
-blinkm:setFadeSpeed(20)
-blinkm:setTimeAdjust(-10)
+print("Setting fade speed")
+blink:setFadeSpeed(20)
+print("Setting time adjust")
+blink:setTimeAdjust(10)
+print("playing light script")
 blink:playLightScript(12,0x00,0x00)

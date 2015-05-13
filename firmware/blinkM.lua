@@ -10,14 +10,14 @@ end
 
 function send0(addr, command)
 	i2c.start(id)
-	i2c.address(id, addr, i2c.transmitter)
+	i2c.address(id, addr, i2c.TRANSMITTER)
 	i2c.write(id, command)
 	i2c.stop(id)
 end
 
 function send1(addr, command, p1)
 	i2c.start(id)
-	i2c.address(id, addr, i2c.transmitter)
+	i2c.address(id, addr, i2c.TRANSMITTER)
 	i2c.write(id, command)
 	i2c.write(id, p1)
 	i2c.stop(id)
@@ -58,7 +58,7 @@ function blinkm:fadeToRandomHSB(h, s, b)
 end
 
 function blinkm:fadeToRandomRGB(r,g,b)
-	send3(self.addr, 'C',r,g,b)
+	send3(self.addr, 'C', r, g, b)
 end
 
 function blinkm:playLightScript(n,r,p)
