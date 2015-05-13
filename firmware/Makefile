@@ -7,28 +7,28 @@ all: main init mcp9808 blinkm
 main: .main.tmp
 
 .main.tmp: main.lua
-	python2.7 ${luatool} -p ${port} --src main.lua --dest main.lua
+	python2.7 ${luatool} -p ${port} --src $< --dest $<
 	touch .main.tmp
 
 .phony: init
 init: .init.tmp	
 
 .init.tmp: init.lua
-	python2.7 ${luatool} -p ${port} --src init.lua --dest init.lua
+	python2.7 ${luatool} -p ${port} --src $< --dest $<
 	touch .init.tmp
 
 .phony: mcp9808
 mcp9808: .mcp9808.tmp
 
 .mcp9808.tmp: mcp9808.lua
-	python2.7 ${luatool} -p ${port} --src mcp9808.lua --dest mcp9808.lua
+	python2.7 ${luatool} -p ${port} --src $< --dest $< -c
 	touch .mcp9808.tmp
 
 .phony: blinkm
 blinkm: .blinkm.tmp
 
 .blinkm.tmp: blinkM.lua
-	python2.7 ${luatool} -p ${port} --src blinkM.lua --dest blinkM.lua
+	python2.7 ${luatool} -p ${port} --src $< --dest $< -c
 	touch .blinkm.tmp
 
 list:
@@ -36,4 +36,4 @@ list:
 
 .phony: clean
 clean:
-	rm .*
+	rm .*.tmp
